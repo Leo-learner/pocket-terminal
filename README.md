@@ -40,7 +40,7 @@ npm start
 
 `deploy/install-server.sh <release-dir> <public-key-file>` 只配置独立站点与受限的pocket-tunnel账号。每次更新前备份已有站点、发布指针和隧道公钥；验证nginx配置后reload。HTTPS证书使用Certbot，系统定时器负责续期。
 
-`node scripts/install-mac.mjs` 生成专用隧道密钥与LaunchAgent草案；`--install`安装当前用户登录启动项。进程以Leo普通用户运行，SSH严格验证已经信任的服务器主机密钥。
+`node scripts/install-mac.mjs` 生成专用隧道密钥与LaunchAgent草案；`--install`将运行文件复制到 `~/Library/Application Support/PocketTerminal`，再安装当前用户登录启动项（请用Node22执行）。进程以Leo普通用户运行，SSH严格验证已经信任的服务器主机密钥。
 
 停止远程访问：卸载两个 `com.leo.pocket-terminal` / `com.leo.pocket-terminal-tunnel` LaunchAgent，或停止对应服务。保留tmux会话；必须显式结束会话才终止其中进程。
 
