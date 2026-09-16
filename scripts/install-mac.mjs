@@ -8,7 +8,14 @@ const install=process.argv.includes('--install');
 const root=install?path.join(os.homedir(),'Library/Application Support/PocketTerminal'):sourceRoot;
 if(install){
  await fs.mkdir(root,{recursive:true,mode:0o700});
- for(const name of ['server','dist','node_modules','package.json'])await fs.cp(path.join(sourceRoot,name),path.join(root,name),{recursive:true,force:true});
+ const stamp=String(Date.now());
+ for(const name of ['server','dist','node_modules','package.json']){
+  const staging=path.join(root,'.staging-'+stamp+'-'+name);
+  await fs.cp(path.join(sourceRoot,name),staging,{recursive:true,verbatimSymlinks:true});
+  const target=path.join(root,name);
+  try{await fs.lstat(target);const backup=path.join(root,'.previous-'+stamp);await fs.mkdir(backup,{recursive:true});await fs.rename(target,path.join(backup,name));}catch(error){if(error.code!=='ENOENT')throw error;}
+  await fs.rename(staging,target);
+ }
  await fs.mkdir(path.join(root,'.runtime'),{recursive:true,mode:0o700});
  for(const name of ['auth.json','access-key.txt','tunnel_ed25519','tunnel_ed25519.pub']){const target=path.join(root,'.runtime',name);try{await fs.stat(target);}catch{await fs.copyFile(path.join(sourceRoot,'.runtime',name),target);await fs.chmod(target,0o600);}}
 }
